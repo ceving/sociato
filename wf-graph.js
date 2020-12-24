@@ -56,8 +56,7 @@ class WfGraph extends HTMLElement
 		  html ('button', {id: 'zoom-reset', type: 'button'}, text ('Zoom Reset')),
 		  html ('button', {id: 'center', type: 'button'}, text ('Center')),
 		  html ('span', {id: 'mouse-log'})),
-	    svg ('svg', {class:  camel2hyphen (this.constructor.name),
-			 width:  this.dataset.width,
+	    svg ('svg', {width:  this.dataset.width,
 			 height: this.dataset.height},
 		 svg ('g', {transform: `matrix(1,0,0,1,${this.dataset.width/2},${this.dataset.height/2})`},
 		     ))));
@@ -94,7 +93,7 @@ class WfElement extends HTMLElement
   constructor ()
   {
     super();
-    this.group = svg ('g', {class: camel2hyphen (this.constructor.name),
+    this.group = svg ('g', {class: 'element',
 			    transform: 'translate(0,0)'});
     this.dataset.selected = this.selected = false;
   }
@@ -110,9 +109,12 @@ class WfElement extends HTMLElement
       throw new TypeError ('Child elements of wf-graph require an id!');
     this.graph.group.appendChild (this.group);
     this.symbol ();
-    var label = svg ('text', {x: 0, y: 30, editable: 'simple'}, text (this.textContent));
+    var txt = this.textContent;
+    var label = svg ('text', {x: 0, y: 30}, text (txt));
     this.group.appendChild (label);
     var label_box = label.getBBox();
+    console.log (txt, label.isConnected, label.getBBox());
+    setTimeout (function () {console.log (txt, label.isConnected, label.getBBox())}, 1000);
     var label_rect = svg ('rect', {class:  'text',
 				   x:      -label_box.width/2 -1,
 				   y:      label_box.y        -1,

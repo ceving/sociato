@@ -10,6 +10,9 @@
       code, pre { font-family: 'Source Code Pro'; }
       code { background-color: #eee; }
       pre { padding: 1ex; border: 1px solid lightgray; }
+      span.element { color: blue; }
+      span.attribute { color: indigo; }
+      span.value { color: brown; }
     </style>
     <!-- For for offline tests set privacy.file_unique_origin=false -->
     <script src="main.js" type="module"></script>
@@ -24,23 +27,30 @@
       Drag the background to move the whole sketch. Drag the elements
       to move them. Use the mouse wheel to zoom in and out.
     </p>
-<wf-graph id="g1" data-width="880" data-height="660">
-  <wf-state id="s1">Start</wf-state>
-  <wf-state id="s2">End</wf-state>
-  <wf-task id="t1">Work</wf-task>
-</wf-graph>
+    <wf-graph id="g1" data-width="880" data-height="660">
+      <wf-state id="s1">Start</wf-state>
+      <wf-state id="s2">End</wf-state>
+      <wf-task id="t1">Text</wf-task>
+    </wf-graph>
     <p>
-      The whole graph is build out of HTML custom
+      The whole graph is build out of the HTML custom
       elements <code>wf-graph</code>, <code>wf-state</code>
-      and <code>wf-task</code>.  These custom elements define domain
-      specific language (DSL).  The following shows the DSL for the
-      above graph.
+      and <code>wf-task</code>.  These custom elements define a domain
+      specific language (DSL).  The following shows a live copy of the
+      the DSL of the above graph.
     </p>
     <pre></pre>
     <script>
       function updatepre () {
-	document.querySelector ('pre').innerText =
-	  document.querySelector ('wf-graph').outerHTML; }
+	document.querySelector ('pre').innerHTML =
+	  document.querySelector ('wf-graph').outerHTML
+	  .replace (/^    /gm, '')
+	  .replace (/</g, '&lt;')
+	  .replace (/\b(\S+)="([^"]+)"/g,
+		    '<span class="attribute">$1</span>="<span class="value">$2</span>"')
+	  .replace (/\bwf-(graph|state|task)\b/g,
+		    '<span class="element">$&</span>')
+	;}
       updatepre();
       new MutationObserver (updatepre).observe (
 	document.querySelector ('wf-graph'),

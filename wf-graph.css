@@ -55,10 +55,10 @@ rect.box {
   fill: transparent;
 }
 
-g.wf-state:hover rect.box {
+g.element:hover rect.box {
   fill: #249be638;
 }
 
-g.wf-state:hover rect.text {
+g.element:hover rect.text {
   fill: transparent;
 }
