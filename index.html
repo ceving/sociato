@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Workflow Graph</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Code+Pro" />
+    <style>
+      body { font-family: 'Source Sans Pro'; }
+      code, pre { font-family: 'Source Code Pro'; }
+      code { background-color: #eee; }
+      pre { padding: 1ex; border: 1px solid lightgray; }
+    </style>
+    <!-- For for offline tests set privacy.file_unique_origin=false -->
+    <script src="main.js" type="module"></script>
+  </head>
+  <body>
+    <h1>Workflow Graph</h1>
+    <p>
+      The following is a HTML custom element implementing an editor
+      for a Workflow Graph.
+    </p>
+    <p>
+      Drag the background to move the whole sketch. Drag the elements
+      to move them. Use the mouse wheel to zoom in and out.
+    </p>
+<wf-graph id="g1" data-width="880" data-height="660">
+  <wf-state id="s1">Start</wf-state>
+  <wf-state id="s2">End</wf-state>
+  <wf-task id="t1">Work</wf-task>
+</wf-graph>
+    <p>
+      The whole graph is build out of HTML custom
+      elements <code>wf-graph</code>, <code>wf-state</code>
+      and <code>wf-task</code>.  These custom elements define domain
+      specific language (DSL).  The following shows the DSL for the
+      above graph.
+    </p>
+    <pre></pre>
+    <script>
+      function updatepre () {
+	document.querySelector ('pre').innerText =
+	  document.querySelector ('wf-graph').outerHTML; }
+      updatepre();
+      new MutationObserver (updatepre).observe (
+	document.querySelector ('wf-graph'),
+	{attributes: true, childList: true, subtree: true});
+    </script>
+  </body>
+</html>
