@@ -18,14 +18,13 @@ export {Movability};
 class Movability
 {
   /**
-   * Calculate the position of the event relative to the SVG
-   * container.
+   * Calculate the position of the event.  Unscale the position by the
+   * amount the parent element is scaled.
    */
   position (event)
   {
-    var ctm = this.svg.getScreenCTM ();
-    return [(event.clientX - ctm.e) / ctm.a,
-	    (event.clientY - ctm.f) / ctm.d];
+    var ctm = this.moving.parentElement.getScreenCTM ();
+    return [event.clientX / ctm.a, event.clientY / ctm.d];
   }
 
   /**

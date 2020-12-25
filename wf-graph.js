@@ -4,6 +4,82 @@ import {text, element, html, svg} from './dom-util.js';
 import {camel2hyphen} from './string-util.js';
 import {Movability} from './movability.js';
 
+/**
+* Internal styles are necessary, because external styles of a shadow
+* root are loaded asynchronously.  This has the effect, that the
+* bounding box of a text element changes, when the style gets applied
+* to the text.  And there is no chance to know when the style got
+* applied, because a style change event does not exist.
+*/
+function style ()
+{
+  return html ('style', {}, text (`
+:host {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+div.flex {
+  align-items: baseline;
+}
+
+svg {
+  vertical-align: top;
+  border: 0.1vmin solid lightgray;
+  stroke-width: 0;
+}
+
+div.buttons * + * {
+  margin-left: 1ex;
+}
+
+div.buttons {
+  margin-bottom: 1ex;
+}
+
+text {
+  font: normal 15px sans-serif;
+  fill: black;
+  text-anchor: middle;
+}
+
+.margin {
+  fill: transparent;
+}
+
+.border {
+  fill: black;
+}
+
+.fill {
+  fill: white;
+}
+
+.handle.selected {
+  fill: #cfe9fa;
+}
+
+.handle:hover {
+  cursor: move;
+}
+
+rect.text {
+  fill: #ffffffc8;
+}
+
+rect.box {
+  fill: transparent;
+}
+
+g.element:hover rect.box {
+  fill: #249be638;
+}
+
+g.element:hover rect.text {
+  fill: transparent;
+}
+`));
+}
 
 /**
 * Workflow Graph
@@ -19,14 +95,14 @@ class WfGraph extends HTMLElement
   
   scale (factor, relative=true)
   {
-    var list = this.container.transform.baseVal;
+    var list = this.group.transform.baseVal;
     list.consolidate();
     var transform = list.createSVGTransformFromMatrix(list.getItem(0).matrix);
     var scale = relative ? transform.matrix.a + factor : factor;
     if (scale < 0.2) scale = 0.2;
     transform.matrix.a = scale;
     transform.matrix.d = scale;
-    this.container.transform.baseVal.initialize (transform);
+    this.group.transform.baseVal.initialize (transform);
   }
 
   zoom (direction)
@@ -45,9 +121,9 @@ class WfGraph extends HTMLElement
     if (!this.dataset.width)  this.dataset.width  = 400;
     if (!this.dataset.height) this.dataset.height = 300;
 
+    this.shadowRoot.appendChild (style());
+
     // Create dom tree
-    this.shadowRoot.appendChild (
-      html ('link', {rel: 'stylesheet', href: 'wf-graph.css'}));
     this.shadowRoot.appendChild (
       html ('div', {display: 'grid'},
 	    html ('div', {class: 'buttons', display: 'flex'},
@@ -116,18 +192,17 @@ class WfElement extends HTMLElement
     console.log (txt, label.isConnected, label.getBBox());
     setTimeout (function () {console.log (txt, label.isConnected, label.getBBox())}, 1000);
     var label_rect = svg ('rect', {class:  'text',
-				   x:      -label_box.width/2 -1,
-				   y:      label_box.y        -1,
-				   width:  label_box.width    +2,
-				   height: label_box.height   +2});
+				   x:      label_box.x -4,
+				   y:      label_box.y -2,
+				   width:  label_box.width +8,
+				   height: label_box.height +4});
     this.group.insertBefore (label_rect, label);
-    // Complicate calculation of the bounding box, because getBBox is
-    // unreliable here.
+    var group_box = this.group.getBBox();
     var group_rect = svg ('rect', {class: 'box',
-				   x:      label_rect.x.baseVal.value             -1,
-				   y:      -14                                    -1,
-				   width:  label_rect.width.baseVal.value         +2,
-				   height: label_rect.height.baseVal.value + 2*14 +2,
+				   x:      group_box.x -2,
+				   y:      group_box.y -2,
+				   width:  group_box.width +4,
+				   height: group_box.height +4,
 				   rx:     5,
 				   ry:     5});
     this.group.insertBefore (group_rect, this.group.firstChild);
